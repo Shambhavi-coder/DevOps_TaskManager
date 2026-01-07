@@ -5,9 +5,9 @@ name: build-and-lint
 # trigger on push to these branches
 on:
   push:
-    branches: [main, dev]
+    branches: [master, dev]
   pull_request:
-    branches: [main, dev]
+    branches: [master, dev]
 
     # define a job (multiple jobs also)
 jobs:
