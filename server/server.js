@@ -1,9 +1,8 @@
-
 import express from 'express';
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const taskRoutes = require('./routes/tasks');
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import taskRoutes from './routes/tasks.js';
 
 // Load environment variables
 dotenv.config();
@@ -26,7 +25,7 @@ app.get('/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack, next);
+  console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
@@ -37,10 +36,7 @@ app.use('*', (req, res) => {
 
 // Database connection
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(PORT, () => {
@@ -54,7 +50,7 @@ mongoose
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log(' Changing to -Shutting down gracefully...');
+  console.log('Shutting down gracefully...');
   await mongoose.connection.close();
   process.exit(0);
 });
