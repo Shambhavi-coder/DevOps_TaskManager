@@ -4,6 +4,8 @@ services:
   mongo:
     image: mongo
     container_name: mongo
+    ports:
+      - "27017:27017"
     volumes:
       - mongo-data:/data/db
 
@@ -18,7 +20,10 @@ services:
       - mongo
 
   frontend:
-    build: ./client
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: http://13.63.19.150:5000/api
     container_name: frontend
     ports:
       - "5173:5173"
