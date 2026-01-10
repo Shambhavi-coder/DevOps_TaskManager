@@ -1,15 +1,11 @@
-  
 name: build-and-lint
 
-# triggers: define when this workflow should run
-# trigger on push to these branches
 on:
   push:
     branches: [master, dev]
   pull_request:
     branches: [master, dev]
 
-    # define a job (multiple jobs also)
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
@@ -39,6 +35,9 @@ jobs:
         working-directory: client
         run: npm run lint -- --max-warnings=0
 
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
       - name: Build backend image
         run: docker build -t backend ./server
 
@@ -49,6 +48,7 @@ jobs:
     needs: build-and-lint
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout (optional)
         uses: actions/checkout@v4
@@ -67,7 +67,7 @@ jobs:
         env:
           EC2_KEY: ${{ secrets.EC2_KEY }}
 
-      - name: Deploy on EC2 (git pull + docker compose up -d --build)
+      - name: Deploy on EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
@@ -78,11 +78,9 @@ jobs:
             cd "${EC2_APP_DIR}"
 
             git fetch --all
-            git reset --hard origin/main
+            git reset --hard origin/master
 
             docker compose up -d --build
-
             docker image prune -f
-
             docker compose ps
           EOF
